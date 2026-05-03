@@ -5,10 +5,15 @@ from datetime import datetime, timedelta, timezone
 URL = 'https://api.weather.gov/stations/KIPJ/observations/'
 FILE = 'weatherData.csv'
 
+my_timezone = timezone(timedelta(hours=0))
+iso_now = datetime.now(my_timezone).isoformat()
+
 def fahrenheit(celsius):
    return (celsius * 9/5) + 32
 
 def save_data(data):
+   print(f'Saving weather data')
+
    # Access properties
    features = data['features']
 
@@ -44,7 +49,6 @@ def save_data(data):
          # For cloud layers, join details into a string
          cloud_layers = properties.get('cloudLayers', [])
          cloud_info = '; '.join([f"{layer.get('amount')} at {layer.get('base', {}).get('value')}m" for layer in cloud_layers])
-         my_timezone = timezone(timedelta(hours=0))
 
          # Data to write into CSV
          row = {
@@ -65,7 +69,7 @@ def save_data(data):
             'heatIndex (%)': heatIndex,
             'Cloud Layers': cloud_info,
             'Text Description': textDescription,
-            'Time Created': datetime.now(my_timezone).isoformat()
+            'Time Created': iso_now
          }
 
          # Write data to file
@@ -107,8 +111,9 @@ def excel_date(iso_string):
 
    return excel_date_value
 
-
-#while True:
+# Mainline
+print("=======================")
+print(f"Getting Weather data at {iso_now}")
 data=get_weather()
 save_data(data)
-   #time.sleep(3600)  # Wait for 600 seconds (10 minutes)
+print('-----------------------')
